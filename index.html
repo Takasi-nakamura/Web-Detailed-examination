@@ -13,5 +13,26 @@
 <section id="results" class="view"><div class="report-head"><div><div class="eyebrow">EXAMINATION REPORT</div><h2 id="reportTitle">診断レポート</h2><a id="reportUrl" target="_blank" rel="noopener noreferrer"></a></div><div class="report-actions"><button id="copyReport" class="secondary-button">レポートをコピー</button><button id="newScan" class="primary-button">新しく調べる</button></div></div><div class="score-card"><div class="score-main"><span>総合スコア</span><strong id="overallScore">--</strong><small>/ 100</small></div><div id="scoreSummary" class="score-summary"></div></div><div id="findingSummary" class="finding-summary"></div><div class="report-grid"><div class="report-section"><div class="section-title"><span>問題と改善提案</span><span id="findingCount"></span></div><div id="findings"></div></div><aside class="side-panel"><div class="section-title">サイト情報</div><div id="siteFacts" class="facts"></div><div class="section-title second">検査カテゴリ</div><div id="categoryScores" class="category-scores"></div></aside></div><div class="strengths"><div class="section-title">良かったところ</div><ul id="strengths"></ul></div><div class="visual-inspection"><div class="section-title">仮想ブラウザで確認した画面</div><p>AIはこのレンダリング結果を見てUI/UX・レスポンシブ・情報設計を評価しています。</p><div class="visual-grid"><div class="visual-card"><h4>デスクトップ</h4><img id="desktopShot" alt="対象サイトのデスクトップ表示"></div><div class="visual-card mobile"><h4>スマートフォン</h4><img id="mobileShot" alt="対象サイトのスマートフォン表示"></div></div></div><div class="technical"><div class="section-title">技術詳細 <button id="toggleTechnical" class="mini-button">表示</button></div><pre id="technicalData" class="hidden"></pre></div></section>
 <section id="history" class="view"><div class="page-heading"><div class="eyebrow">HISTORY</div><h2>検査履歴</h2><p>このブラウザに保存されたレポートです。</p></div><div id="historyList" class="history-list"></div></section>
 <section id="settings" class="view"><div class="page-heading"><div class="eyebrow">SETTINGS</div><h2>設定</h2><p>Gemini APIキーとAIモデルを管理します。</p></div><div class="settings-card"><label class="field-label">AIプロバイダー</label><div class="model-fixed">Google Gemini API</div><label class="field-label" for="apiKey">Gemini APIキー</label><div class="secret-field"><input id="apiKey" type="password" placeholder="AIza..." autocomplete="off"><button id="showKey" type="button">表示</button></div><label class="field-label">AIモデル</label><div class="model-grid"><label><input type="radio" name="model" value="gemini-3.5-flash-lite"><span><b>Gemini 3.5 Flash-Lite</b><small>高速・低コスト重視</small></span></label><label><input type="radio" name="model" value="gemini-3.6-flash"><span><b>Gemini 3.6 Flash</b><small>速度とマルチモーダル性能のバランス</small></span></label><label><input type="radio" name="model" value="gemini-3.7-flash"><span><b>Gemini 3.7 Flash</b><small>高性能・詳細なUI/UX分析向け</small></span></label></div><div class="setting-row"><div><b>APIキーを保存</b><p>ブラウザのLocalStorageに保存します。サーバーには保存しません。</p></div><input id="saveKey" type="checkbox" checked></div><button id="saveSettings" class="primary-button full">設定を保存</button><p id="settingsStatus" class="status-text"></p></div><div class="settings-note"><b>プライバシーについて</b><p>このアプリは静的ホスティングで動作します。APIキーはこのブラウザにのみ保存され、AIへの通信はGoogle Gemini APIへ直接送信されます。</p></div></section>
-</main><div id="toast" class="toast" role="status"></div><script src="app.js"></script>
+</main><div id="toast" class="toast" role="status"></div>
+<script>
+(function(){
+  const nativeFetch=window.fetch.bind(window);
+  window.fetch=function(input,init){
+    const target=typeof input==='string'?input:(input&&input.url)||'';
+    if(target.startsWith('https://r.jina.ai/')){
+      const original=target.slice('https://r.jina.ai/'.length);
+      const endpoint='/api/page?url='+encodeURIComponent(original);
+      return nativeFetch(endpoint,init).then(async r=>{
+        if(r.ok){
+          const j=await r.json();
+          if(j.ok&&j.html)return new Response(j.html,{status:200,headers:{'Content-Type':'text/html;charset=utf-8','X-WDE-Renderer':'Chromium'}});
+        }
+        return nativeFetch(input,init);
+      });
+    }
+    return nativeFetch(input,init);
+  };
+})();
+</script>
+<script src="app.js"></script>
 </body></html>
