@@ -1,0 +1,9 @@
+{
+  "name": "web-detailed-examination",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "@sparticuz/chromium": "149.0.0",
+    "playwright-core": "1.55.0"
+  }
+}
