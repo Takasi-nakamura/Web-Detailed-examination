@@ -1,0 +1,11 @@
+{
+  "name": "Web Detailed Examination",
+  "short_name": "Web Examination",
+  "description": "URLを入力するだけでWebサイトを詳しく調査・診断するAIツール",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f7f5",
+  "theme_color": "#0a0a0a",
+  "lang": "ja",
+  "icons": []
+}
