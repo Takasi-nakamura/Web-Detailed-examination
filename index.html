@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="description" content="URLを入力するだけでWebサイトを詳しく調査・診断するAIツール">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%230a0a0a%22/><circle cx=%2228%22 cy=%2228%22 r=%2215%22 fill=%22none%22 stroke=%22white%22 stroke-width=%225%22/><path d=%22m39 39 13 13%22 stroke=%22white%22 stroke-width=%225%22 stroke-linecap=%22round%22/></svg>">
+  <title>Web Detailed Examination</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Web Detailed Examination ホーム"><span class="brand-mark">W</span><span>Web Detailed Examination</span></a>
+    <nav class="topnav" aria-label="メインナビゲーション">
+      <button class="nav-button active" data-view="home">検査</button>
+      <button class="nav-button" data-view="history">履歴</button>
+      <button class="nav-button" data-view="settings">設定</button>
+    </nav>
+    <button class="icon-button" id="themeToggle" title="表示切替" aria-label="表示切替">◐</button>
+  </header>
+
+  <main>
+    <section id="home" class="view active-view">
+      <div class="hero">
+        <div class="eyebrow">WEB INSPECTION / AI ANALYSIS</div>
+        <h1>Webサイトを、<br><span>徹底的に調べる。</span></h1>
+        <p>URLを入力すると、構造・SEO・UI/UX・アクセシビリティ・パフォーマンス・セキュリティを調査し、AIがわかりやすい診断レポートにまとめます。</p>
+        <form id="scanForm" class="scan-form">
+          <div class="url-box"><span>https://</span><input id="urlInput" type="url" inputmode="url" autocomplete="url" placeholder="example.com" required><button type="submit" id="scanButton">調べる</button></div>
+          <div class="quick-options"><label><input type="checkbox" id="deepScan" checked> 詳細調査</label><span>公開ページのみを対象にします</span></div>
+        </form>
+        <div id="setupHint" class="setup-hint hidden">AI診断には設定画面でOpenRouter APIキーを登録してください。キーはこのブラウザ内にのみ保存されます。</div>
+      </div>
+      <div class="feature-grid">
+        <article><b>01</b><h3>サイト構造</h3><p>HTML、見出し、リンク、画像、フォーム、外部リソースなどを整理。</p></article>
+        <article><b>02</b><h3>品質診断</h3><p>SEO、UI/UX、アクセシビリティ、パフォーマンス、基本的な安全性を確認。</p></article>
+        <article><b>03</b><h3>AIレポート</h3><p>技術用語だけで終わらせず、問題の意味と改善方法を日本語で説明。</p></article>
+      </div>
+    </section>
+
+    <section id="progress" class="view">
+      <div class="progress-wrap">
+        <div class="eyebrow">ANALYZING</div><h2 id="progressTitle">Webサイトを調査しています</h2><p id="progressUrl"></p>
+        <div class="progress-track"><div id="progressBar"></div></div>
+        <div id="progressSteps" class="progress-steps"></div>
+        <button class="text-button" id="cancelScan">キャンセル</button>
+      </div>
+    </section>
+
+    <section id="results" class="view">
+      <div class="report-head"><div><div class="eyebrow">EXAMINATION REPORT</div><h2 id="reportTitle">診断レポート</h2><a id="reportUrl" target="_blank" rel="noopener noreferrer"></a></div><div class="report-actions"><button id="copyReport" class="secondary-button">レポートをコピー</button><button id="newScan" class="primary-button">新しく調べる</button></div></div>
+      <div class="score-card"><div class="score-main"><span>総合スコア</span><strong id="overallScore">--</strong><small>/ 100</small></div><div id="scoreSummary" class="score-summary"></div></div>
+      <div id="findingSummary" class="finding-summary"></div>
+      <div class="report-grid">
+        <div class="report-section"><div class="section-title"><span>問題と改善提案</span><span id="findingCount"></span></div><div id="findings"></div></div>
+        <aside class="side-panel"><div class="section-title">サイト情報</div><div id="siteFacts" class="facts"></div><div class="section-title second">検査カテゴリ</div><div id="categoryScores" class="category-scores"></div></aside>
+      </div>
+      <div class="technical"><div class="section-title">技術詳細 <button id="toggleTechnical" class="mini-button">表示</button></div><pre id="technicalData" class="hidden"></pre></div>
+    </section>
+
+    <section id="history" class="view"><div class="page-heading"><div class="eyebrow">HISTORY</div><h2>検査履歴</h2><p>このブラウザに保存されたレポートです。</p></div><div id="historyList" class="history-list"></div></section>
+
+    <section id="settings" class="view"><div class="page-heading"><div class="eyebrow">SETTINGS</div><h2>設定</h2><p>APIキーなど、この端末だけで使う設定を管理します。</p></div><div class="settings-card"><label class="field-label" for="provider">AIプロバイダー</label><select id="provider"><option value="openrouter">OpenRouter</option></select><label class="field-label" for="apiKey">OpenRouter APIキー</label><div class="secret-field"><input id="apiKey" type="password" placeholder="sk-or-v1-..." autocomplete="off"><button id="showKey" type="button">表示</button></div><label class="field-label" for="model">AIモデル</label><select id="model"><option value="openrouter/free">無料モデルを自動選択（推奨）</option><option value="openrouter/auto">OpenRouter Auto</option></select><div class="setting-row"><div><b>APIキーを保存</b><p>ブラウザのLocalStorageに保存します。サーバーには保存しません。</p></div><input id="saveKey" type="checkbox" checked></div><button id="saveSettings" class="primary-button full">設定を保存</button><p id="settingsStatus" class="status-text"></p></div><div class="settings-note"><b>プライバシーについて</b><p>このアプリはGitHub Pagesなどの静的ホスティングで動作します。入力したAPIキーは第三者のサーバーへ保存しません。AIへの通信は選択したAIプロバイダーへ直接送信されます。無料モデルには利用制限やモデル変更がある場合があります。</p></div></section>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
